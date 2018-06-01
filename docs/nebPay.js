@@ -1,13 +1,49 @@
 require=(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
 
-var payUrl = "https://pay.nebulas.io/api/pay";
+var isChrome = function () {
+    if (typeof window !== "undefined") {
+        var userAgent = navigator.userAgent.toLowerCase();
+        if (userAgent.match(/chrome\/([\d\.]+)/)) {
+            return true;
+        }
+    }
+    return false;
+};
+
+var randomCode = function (len) {
+    var d,
+        e,
+        b = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        c = "";
+    for (d = 0; len > d; d += 1) {
+        e = Math.random() * b.length;
+        e = Math.floor(e);
+        c += b.charAt(e);
+    }
+    return c;
+};
 
 module.exports = {
-    payUrl: payUrl
+    isChrome: isChrome,
+    randomCode: randomCode
 };
 
 },{}],2:[function(require,module,exports){
+"use strict";
+
+//var payUrl = "https://pay.nebulas.io/api/pay"; //
+
+var mainnetUrl = "https://pay.nebulas.io/api/mainnet/pay",
+    testnetUrl = "https://pay.nebulas.io/api/pay";
+
+module.exports = {
+    //payUrl: payUrl,
+    mainnetUrl: mainnetUrl,
+    testnetUrl: testnetUrl
+};
+
+},{}],3:[function(require,module,exports){
 "use strict";
 
 var callbackMap = {};
@@ -43,7 +79,7 @@ window.addEventListener('message', function (resp) {
 
 module.exports = openExtension;
 
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
 var get = function (url, body) {
@@ -63,24 +99,25 @@ var post = function (url, body) {
     };
     return request(obj);
 };
-
 var request = function (obj) {
-    return new Promise((resolve, reject) => {
-        let xhr = new XMLHttpRequest();
+    return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest();
         xhr.open(obj.method || "GET", obj.url);
         if (obj.headers) {
-            Object.keys(obj.headers).forEach(key => {
+            Object.keys(obj.headers).forEach(function (key) {
                 xhr.setRequestHeader(key, obj.headers[key]);
             });
         }
-        xhr.onload = () => {
+        xhr.onload = function () {
             if (xhr.status >= 200 && xhr.status < 300) {
                 resolve(xhr.response);
             } else {
                 reject(xhr.statusText);
             }
         };
-        xhr.onerror = () => reject(xhr.statusText);
+        xhr.onerror = function () {
+            return reject(xhr.statusText);
+        };
         xhr.send(obj.body);
     });
 };
@@ -91,14 +128,14 @@ module.exports = {
     request: request
 };
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 var BigNumber = require("bignumber.js");
 
-var Utils = require("./utils");
+var Utils = require("./Utils");
 var QRCode = require("./qrcode");
-var Config = require("./config");
+//var Config = require("./config");
 
 var openExtension = require("./extensionUtils.js");
 
@@ -164,7 +201,7 @@ function showQRCode(params, options) {
 
 module.exports = Pay;
 
-},{"./config":1,"./extensionUtils.js":2,"./qrcode":5,"./utils":6,"bignumber.js":7}],5:[function(require,module,exports){
+},{"./Utils":1,"./extensionUtils.js":3,"./qrcode":6,"bignumber.js":7}],6:[function(require,module,exports){
 "use strict";
 
 var QRCode = require('qrcode');
@@ -188,32 +225,33 @@ var addCssRule = function () {
 var createDeaultQRContainer = function () {
 	var canvas = document.createElement("canvas");
 	canvas.className = "qrcode";
-	var canvasStyle = `box-shadow: 2px 2px 12px lightgray;`;
+	var canvasStyle = "box-shadow: 2px 2px 12px lightgray;";
 	addCssRule(".qrcode", canvasStyle);
 
 	var qrcontainer = document.createElement("div");
 	qrcontainer.className = "qrcode-container";
-	var style = `text-align: center;
-    background-color: #fff0;
-    border-radius: 20px;
-    width: 300px;
-    height: 300px;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%,-50%);`;
+	/*jshint multistr: true */
+	var style = "text-align: center;\
+    background-color: #fff0;\
+    border-radius: 20px;\
+    width: 300px;\
+    height: 300px;\
+    position: absolute;\
+    left: 50%;\
+    top: 50%;\
+    transform: translate(-50%,-50%);";
 	addCssRule(".qrcode-container", style);
 	qrcontainer.appendChild(canvas);
 
 	var background = document.createElement("div");
 	background.className = "qrcode-background";
-	style = `position:absolute;
-	left:0;
-	top:0;
-	z-index:100;
-	height:100%;
-	width:100%;
-	background-color: rgba(0, 0, 0, 0.4);`;
+	style = "position:absolute;\
+	left:0;\
+	top:0;\
+	z-index:100;\
+	height:100%;\
+	width:100%;\
+	background-color: rgba(0, 0, 0, 0.4);";
 	addCssRule(".qrcode-background", style);
 	background.appendChild(qrcontainer);
 
@@ -245,36 +283,7 @@ module.exports = {
 	showQRCode: showQRCode
 };
 
-},{"qrcode":12}],6:[function(require,module,exports){
-"use strict";
-
-var isChrome = function () {
-    if (typeof window !== "undefined") {
-        var userAgent = navigator.userAgent.toLowerCase();
-        if (userAgent.match(/chrome\/([\d\.]+)/)) {
-            return true;
-        }
-    }
-    return false;
-};
-
-var randomCode = function (len) {
-    var d,
-        e,
-        b = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-        c = "";
-    for (d = 0; len > d; d += 1) {
-        e = Math.random() * b.length, e = Math.floor(e), c += b.charAt(e);
-    }
-    return c;
-};
-
-module.exports = {
-    isChrome: isChrome,
-    randomCode: randomCode
-};
-
-},{}],7:[function(require,module,exports){
+},{"qrcode":12}],7:[function(require,module,exports){
 /*! bignumber.js v5.0.0 https://github.com/MikeMcl/bignumber.js/LICENCE */
 
 ;(function (globalObj) {
@@ -6484,6 +6493,8 @@ var NebPay = function (appKey, appSecret) {
 	this._pay = new Pay(appKey, appSecret);
 };
 
+NebPay.config = config;
+
 var defaultOptions = {
 	goods: {
 		name: "",
@@ -6495,10 +6506,14 @@ var defaultOptions = {
 		showQRCode: false,
 		container: undefined
 	},
+
 	// callback is the return url after payment
-	callback: config.payUrl,
+	//callback: config.payUrl,
+	callback: config.mainnetUrl,
+
 	//listener：specify a listener function to handle payment feedback message(only valid for browser extension)
 	listener: undefined,
+
 	// if use nrc20pay ,should input nrc20 params like address, name, symbol, decimals
 	nrc20: undefined
 };
@@ -6550,20 +6565,24 @@ NebPay.prototype = {
 		return this._pay.submit(NAS, to, value, payload, options);
 	},
 	simulateCall: function (to, value, func, args, options) {
+		//this API will not be supported in the future
 		var payload = {
 			type: "simulateCall",
 			function: func,
 			args: args
 		};
 		options = extend(defaultOptions, options);
+
 		return this._pay.submit(NAS, to, value, payload, options);
 	},
-	queryPayInfo: function (serialNumber) {
-		var url = config.payUrl + "/query?payId=" + serialNumber;
+	queryPayInfo: function (serialNumber, options) {
+		//var url = config.payUrl + "/query?payId=" + serialNumber;
+		options = extend(defaultOptions, options);
+		var url = options.callback + "/query?payId=" + serialNumber;
 		return http.get(url);
 	}
 };
 
 module.exports = NebPay;
 
-},{"./libs/config":1,"./libs/http":3,"./libs/pay":4,"bignumber.js":7,"extend":10}]},{},[]);
+},{"./libs/config":2,"./libs/http":4,"./libs/pay":5,"bignumber.js":7,"extend":10}]},{},[]);

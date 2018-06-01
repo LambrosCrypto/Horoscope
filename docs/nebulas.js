@@ -353,7 +353,7 @@ Account.prototype = {
 
         var json = typeof input === 'object' ? input : JSON.parse(nonStrict ? input.toLowerCase() : input);
         if (json.version !== KeyVersion3 && json.version !== KeyCurrentVersion) {
-            throw new Error('Not supported wallet version');
+          throw new Error('Not supported wallet version');
         }
         var derivedKey;
         var kdfparams;
@@ -1476,7 +1476,7 @@ Transaction.prototype = {
      *    gasLimit: 2000000
      * });
      * var txHash = tx.hashTransaction();
-     * //Uint8Array(32) [211, 213, 102, 103, 23, 231, 246, 141, 20, 202, 210, 25, 92, 142, 162, 242, 232, 95, 44, 239, 45, 57, 241, 61, 34, 2, 213, 160, 17, 207, 75, 40]
+     * //Uint8Array(32) [211, 213, 102, 103, 23, 231, 246, 141, 20, 202, 210, 25, 92, 142, 162, 242, 232, 95, 44, 239, 45, 57, 241, 61, 34, 2, 213, 160, 17, 207, 75, 40]
      */
     hashTransaction: function () {
         var Data = root.lookup("corepb.Data");
@@ -1531,7 +1531,7 @@ Transaction.prototype = {
      *    gasLimit: 2000000
      * });
      * txData = tx.toPlainObject();
-     * // {chainID: 1001, from: "n1USdDKeZXQYubA44W2ZVUdW1cjiJuqswxp", to: "n1SAeQRVn33bamxN4ehWUT7JGdxipwn8b17", value: 1000000000000000000, nonce: 1, …}
+     * // {chainID: 1001, from: "n1USdDKeZXQYubA44W2ZVUdW1cjiJuqswxp", to: "n1SAeQRVn33bamxN4ehWUT7JGdxipwn8b17", value: 1000000000000000000, nonce: 1, …}
      */
     toPlainObject: function () {
         return {
@@ -17149,7 +17149,7 @@ module.exports = Hmac
 },{"cipher-base":97,"inherits":151,"safe-buffer":234}],105:[function(require,module,exports){
 'use strict'
 
-exports.randomBytes = exports.hor = exports.pseudoRandomBytes = exports.phor = require('randombytes')
+exports.randomBytes = exports.rng = exports.pseudoRandomBytes = exports.prng = require('randombytes')
 exports.createHash = exports.Hash = require('create-hash')
 exports.createHmac = exports.Hmac = require('create-hmac')
 
@@ -38887,25 +38887,25 @@ module.exports = bytesToUuid;
 // browser this is a little complicated due to unknown quality of Math.random()
 // and inconsistent support for the `crypto` API.  We do the best we can via
 // feature-detection
-var hor;
+var rng;
 
 var crypto = global.crypto || global.msCrypto; // for IE 11
 if (crypto && crypto.getRandomValues) {
-  // WHATWG crypto hor - http://wiki.whatwg.org/wiki/Crypto
+  // WHATWG crypto RNG - http://wiki.whatwg.org/wiki/Crypto
   var rnds8 = new Uint8Array(16); // eslint-disable-line no-undef
-  hor = function whatwghor() {
+  rng = function whatwgRNG() {
     crypto.getRandomValues(rnds8);
     return rnds8;
   };
 }
 
-if (!hor) {
-  // Math.random()-based (hor)
+if (!rng) {
+  // Math.random()-based (RNG)
   //
   // If all else fails, use Math.random().  It's fast, but is of unspecified
   // quality.
   var rnds = new Array(16);
-  hor = function() {
+  rng = function() {
     for (var i = 0, r; i < 16; i++) {
       if ((i & 0x03) === 0) r = Math.random() * 0x100000000;
       rnds[i] = r >>> ((i & 0x03) << 3) & 0xff;
@@ -38915,11 +38915,11 @@ if (!hor) {
   };
 }
 
-module.exports = hor;
+module.exports = rng;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],256:[function(require,module,exports){
-var hor = require('./lib/hor');
+var rng = require('./lib/rng');
 var bytesToUuid = require('./lib/bytesToUuid');
 
 // **`v1()` - Generate time-based UUID**
@@ -38928,7 +38928,7 @@ var bytesToUuid = require('./lib/bytesToUuid');
 // and http://docs.python.org/library/uuid.html
 
 // random #'s we need to init node and clockseq
-var _seedBytes = hor();
+var _seedBytes = rng();
 
 // Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
 var _nodeId = [
@@ -39020,8 +39020,8 @@ function v1(options, buf, offset) {
 
 module.exports = v1;
 
-},{"./lib/bytesToUuid":254,"./lib/hor":255}],257:[function(require,module,exports){
-var hor = require('./lib/hor');
+},{"./lib/bytesToUuid":254,"./lib/rng":255}],257:[function(require,module,exports){
+var rng = require('./lib/rng');
 var bytesToUuid = require('./lib/bytesToUuid');
 
 function v4(options, buf, offset) {
@@ -39033,7 +39033,7 @@ function v4(options, buf, offset) {
   }
   options = options || {};
 
-  var rnds = options.random || (options.hor || hor)();
+  var rnds = options.random || (options.rng || rng)();
 
   // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
   rnds[6] = (rnds[6] & 0x0f) | 0x40;
@@ -39051,7 +39051,7 @@ function v4(options, buf, offset) {
 
 module.exports = v4;
 
-},{"./lib/bytesToUuid":254,"./lib/hor":255}],258:[function(require,module,exports){
+},{"./lib/bytesToUuid":254,"./lib/rng":255}],258:[function(require,module,exports){
 var indexOf = require('indexof');
 
 var Object_keys = function (obj) {
