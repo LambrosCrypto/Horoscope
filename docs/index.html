@@ -189,12 +189,11 @@
 												$("#hor_request_day").text(response.day);
 												$("#hor_request_month").text(response.month);
 										} else {
-												setTimeout(onClickRefresh, 3000);
+											alert ("The transaction has been rejected. Please try again.");
+											goHome();
 										}
 								});
 						}
-
-						onClickRefresh();
 				</script>
 				<!-- RESULTS SCRIPT -->
 				<script>
