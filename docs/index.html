@@ -66,10 +66,9 @@
 							document.getElementById("one.two").style.display = "block";
 						}
 					</script>
-					<div>
-						<h1> Horoscope Finder</h1>
-						<br>
 						<div id="content">
+							<h1> Horoscope Finder</h1>
+							<br>
 							<div>
 								<div>
 									<span>Day (1-31)</span>
@@ -84,7 +83,7 @@
 							</div>
 							<br>
 							<div>
-								<button href="#one" id=request_horoscope onclick="myFunction();myFunction2();javascript:onClickRequestHoroscope()" class="learn-more-btn">Request Horoscope</button>
+								<button href="#one" id=request_horoscope onclick="myFunction();javascript:onClickRequestHoroscope()" class="learn-more-btn">Request Horoscope</button>
 							</div>
 						</div>
 					</div>
@@ -97,7 +96,12 @@
 					}
 					</script>
 					<!-- Displays a refresh button until the data is available -->
-					<div id=hor_request_pending>
+					<div id=hor_request_pending style="display:none;">
+						<script>
+						if(window.location.href.indexOf("txhash=") != -1){
+							document.getElementById("hor_request_pending").style.display = "block";
+						}
+						</script>
 						<h1 class="animated fadeInDown">Processing</h1>
 						<br>
 							<div class="loader"></div>
@@ -111,7 +115,7 @@
 						<h1 class="animated fadeInDown">Your <span>Horoscope is</span></h1>
 
 									<b><h1 class="animated fadeInDown delay-05s"><span id=hor_request_horoscope></span></h1></b>
-									<p class="animated fadeInUp delay-1s">That horoscope is due to your birthday: <span id=hor_request_day></span>/<span id=hor_request_month></span></p>
+									<p class="animated fadeInUp delay-1s">That horoscope is due to your birthday: <span id=hor_request_day></span>/<span id=hor_request_month></span>. If you want to know more about your Horoscope, press the "More Info" button bellow.</p>
 
 									<p class="animated fadeInUp delay-1s">Horoscope shown at <span id=hor_request_date></span>.
 									<br><br><a id="viewTx" href="#">View Transaction</a> as Proof on the Block Explorer.</p>
@@ -120,20 +124,9 @@
 
 							</div>
 					</div>
-					<!-- HIDE INPUT INTERFAZE FUNCTION -->
-					<script>
-						function myFunction() {
-							var x = document.getElementById("one.one");
-							if (x.style.display === "none") {
-								x.style.display = "block";
-							} else {
-								x.style.display = "none";
-							}
-						}
-					</script>
 					<!-- HIDE RESULTS INTERFAZE FUNCTION -->
 					<script>
-						function myFunction2() {
+						function myFunction() {
 							var y = document.getElementById("one.two");
 							if (y.style.display === "none") {
 								y.style.display = "block";
@@ -210,6 +203,7 @@
 								nebPay.call(contract_address, 0, "requestHoroscope", JSON.stringify([day, month]), {
 										listener: onRequestHoroscope
 								});
+
 						}
 						function onRequestHoroscope(resp) {
 								if(typeof(resp)==='string' && resp.startsWith("Error")) {
@@ -218,6 +212,8 @@
 								if (history.pushState) {
 									var newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?txhash=' + resp.txhash;
 									window.history.pushState({path:newurl},'',newurl);
+									$("#content").hide();
+									$("#hor_request_pending").show();
 								}
 						}
 						//GO TO MAIN PAGE (INDEX) FUNCTION
