@@ -83,7 +83,10 @@
 							</div>
 							<br>
 							<div>
-								<button href="#one" id=request_horoscope onclick="myFunction();javascript:onClickRequestHoroscope()" class="learn-more-btn">Request Horoscope</button>
+								<button href="#one" id=request_horoscope onclick="myFunction();myFunction2();javascript:onClickRequestHoroscope()" class="learn-more-btn">Request Horoscope</button>
+								<div id=cancel>
+									<button onclick="javascript:goHome()" class="learn-more-btn">Cancel</button>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -93,6 +96,7 @@
 					<script>
 					if(window.location.href.indexOf("txhash=") == -1){
 						document.getElementById("one.two").style.display = "none";
+						document.getElementById("cancel").style.display = "none";
 					}
 					</script>
 					<!-- Displays a refresh button until the data is available -->
@@ -108,7 +112,6 @@
 							<br>
 							<p>Waiting for the transaction to be confirmed by Nebulas Blockchain.</p>
 							<button id=refresh onclick="javascript:onClickRefresh()" class="learn-more-btn">Refresh</button>
-							<button id=refresh onclick="javascript:goHome()" class="learn-more-btn">Cancel</button>
 					</div>
 
 					<div id=hor_request>
@@ -133,6 +136,13 @@
 							} else {
 								y.style.display = "none";
 							}
+						}
+					</script>
+					<!-- SHOW CANCEL BUTTON -->
+					<script>
+						function myFunction2() {
+							document.getElementById("cancel").style.display="block";
+							document.getElementById("request_horoscope").style.display="none";
 						}
 					</script>
 				</div>
@@ -222,7 +232,7 @@
 							var dir = href.substring(0, href.lastIndexOf('/')) + "/";
 							window.location = dir + "index.html";
 						}
-							//GO TO GET MORE INFO ABOUT YOUR DAILY HOROSCOPE
+						//GO TO GET MORE INFO ABOUT YOUR DAILY HOROSCOPE
 						function getMoreInfo(){
 							neb.api.call({
 									from: contract_address,
